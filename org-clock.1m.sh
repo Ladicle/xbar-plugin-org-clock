@@ -9,11 +9,12 @@
 # <xbar.dependencies>bash</xbar.dependencies>
 # <xbar.abouturl>https://github.com/Ladicle/xbar-plugin-org-clock</xbar.abouturl>
 
-FILE="~/.xbar/org-clock/clock-in"
+STATUS_FILE="~/.xbar/org-clock/clockin"
+AGENDA_FILE="~/.xbar/org-clock/agenda"
 
 if [ -e ~/.clockin_task ]; then
-  title=$(cat $FILE | cut -f 2)
-  startAt=$(cat $FILE | cut -f 1)
+  title=$(cat $STATUS_FILE | cut -f 2)
+  startAt=$(cat $STATUS_FILE | cut -f 1)
 
   elapsed=$(expr `date +%s` - $startAt)
 
@@ -22,5 +23,9 @@ if [ -e ~/.clockin_task ]; then
 
   printf "%s(%02d:%02d)\n" "$title" "$h" "$m"
 else
-  printf "no target"
+  printf "no target\n"
 fi
+
+agenda=$(cat $AGENDA_FILE | sed -e '/^$/d' | cut -d ' ' -f -50)
+echo "---"
+echo "$agenda"

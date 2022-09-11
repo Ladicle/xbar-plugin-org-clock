@@ -1,6 +1,7 @@
 # xbar plugin org-clock
 
 ![screenshot](./screenshot.png)
+![screenshot-agenda](./screenshot-agenda.png)
 
 This xbar plugin shows the current clock-in item on the menu bar.
 [xbar](https://xbarapp.com/)(ex-BitBar) is a macOS tool that shows the custom message on the menu bar.
@@ -22,21 +23,37 @@ mkdir -p ~/.xbar/org-clock/
 ```
 
 ```emacs-lisp
-(leaf xbar-plugin-org-clock
-  :defvar clockin-task-file
+(leaf xbar-org-clock
+  :defvar
+  (xbar-org-clock-status-file
+   xbar-org-clock-agenda-file
+   xbar-org-clock-agenda-key
+   xbar-org-clock-agenda-sync-interval)
   :custom
-  (clockin-task-file . "~/.xbar/org-clock/status")
+  (xbar-org-clock-status-file . "~/.xbar/org-clock/status")
+  (xbar-org-clock-agenda-file . "~/.xbar/org-clock/agenda")
+  (xbar-org-clock-agenda-key  . "n")
+  (xbar-org-clock-agenda-sync-interval . 1800) ;; 30m
   :preface
-  (defun write-clockin-task-file ()
+  (defun xbar-org-clock--write-agenda ()
+    (progn
+      (org-agenda nil xbar-org-clock-agenda-key)
+      (org-agenda-write xbar-org-clock-agenda-file)))
+  (defun xbar-org-clock--write-clockin-status ()
     (with-temp-buffer
-      (insert (concat (format-time-string "%s" org-clock-start-time) "\t" org-clock-heading))
-      (write-region (point-min) (point-max) clockin-task-file)))
-  (defun delete-clockin-task-file ()
-    (delete-file clockin-task-file))
+      (insert (concat
+               (format-time-string "%s" org-clock-start-time)
+               "\t"
+               org-clock-heading))
+      (write-region (point-min) (point-max) xbar-org-clock-status-file)))
+  (defun xbar-org-clock--delete-clockin-status ()
+    (delete-file xbar-org-clock-status-file))
   :hook
-  (org-clock-in-hook     . write-clockin-task-file)
-  (org-clock-out-hook    . delete-clockin-task-file)
-  (org-clock-cancel-hook . delete-clockin-task-file))
+  (org-clock-in-hook     . xbar-org-clock--write-clockin-status)
+  (org-clock-out-hook    . xbar-org-clock--delete-clockin-status)
+  (org-clock-cancel-hook . xbar-org-clock--delete-clockin-status)
+  :config
+  (run-with-timer 0 xbar-org-clock-agenda-sync-interval 'xbar-org-clock--write-agenda))
 ```
 
 ## References
