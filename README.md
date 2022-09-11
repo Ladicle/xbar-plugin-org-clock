@@ -1,5 +1,7 @@
 # xbar plugin org-clock
 
+![screenshot](./screenshot.png)
+
 This xbar plugin shows the current clock-in item on the menu bar.
 [xbar](https://xbarapp.com/)(ex-BitBar) is a macOS tool that shows the custom message on the menu bar.
 
