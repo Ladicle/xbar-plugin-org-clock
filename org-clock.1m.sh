@@ -21,6 +21,12 @@ if [ -e ~/.clockin_task ]; then
   h=$(expr $elapsed / 3600)
   m=$(expr $elapsed % 3600 / 60)
 
+  # remove progress from title & truncate if more than 3 words
+  title="${title%%[*}"
+  if [[ $(wc -w <<< "$title") -gt 3 ]]; then
+    title="$(awk '{for(i=1;i<=3;i++) printf $i " "; print "..."}' <<< "$title")"
+  fi
+
   printf "%s(%02d:%02d)\n" "$title" "$h" "$m"
 else
   printf "no target\n"
